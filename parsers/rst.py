@@ -4,7 +4,6 @@ from utilities import parser_utility as util
 
 
 class NarberalGamma:
-
     output_dir: str = Path(__name__).cwd() / "output" / "output.py"
 
     cpp_code: str
@@ -54,11 +53,15 @@ class NarberalGamma:
             print(self.cpp_code)
 
     def parse(self):
+        """
+        @TODO перестроить под возможную рекурсию (добавить в параметры текст, который можно было бы прогонять в цикле)
+        :return:
+        """
         i = 0
         while i < len(self.cpp_code):
-            if self.cpp_code[i:i+3] == "int":
+            if self.cpp_code[i:i + 3] == "int":
                 i = self.handle_int(i) - 1
-            elif self.cpp_code[i:i+3] == "for":
+            elif self.cpp_code[i:i + 3] == "for":
                 i = self.handle_for(i) - 1
             elif self.cpp_code[i].isdigit():
                 raise Exception(f"Ошибка в написании программы. Индекс ошибки: {i}")
@@ -68,6 +71,11 @@ class NarberalGamma:
         print(self.parsed_table)
 
     def handle_int(self, i):
+        """
+        @TODO написать комментарии к коду
+        :param i:
+        :return:
+        """
         j = i
         while self.cpp_code[j] != ";":
             j += 1
@@ -75,8 +83,8 @@ class NarberalGamma:
         if not re.match("int [a-zA-Z0-9]+;|int [a-zA-Z0-9]+=[0-9]+;", self.cpp_code[i:j]):
             raise Exception("Непонятный int")
         self.parsed_table.append(f"1.1")
-        substring = self.cpp_code[i+4:j]  # +4, потому что int 3 буквы и пробел 1
-        print(substring)
+        substring = self.cpp_code[i + 4:j]  # +4, потому что int 3 буквы и пробел 1
+        # print(substring)
         # Поиск переменной из подстроки (a1=1234 попытается найти a1)
         if "=" in substring:
             variable = substring[:util.get_position_before_item(substring, "=")]
@@ -90,7 +98,7 @@ class NarberalGamma:
         if "=" in substring:
             value = re.search("=([0-9]+)", substring)
             if value:
-                print(value.group(1))
+                # print(value.group(1))
                 self.table[3].append((variable, value.group(1)))
                 self.parsed_table.append(f"4.{len(self.table[3])}")
             else:
@@ -115,7 +123,7 @@ class NarberalGamma:
         self.parsed_table.append("1.2")
         self.parsed_table.append("3.3")
         predicate_index = util.get_position_before_item(substring, ")") + 1
-        predicate = substring[1:predicate_index-1]
+        predicate = substring[1:predicate_index - 1]
         body_index = predicate_index + 1
         body = substring[body_index + 1:util.get_position_before_item(substring, "}")]
         print(predicate)
@@ -125,18 +133,33 @@ class NarberalGamma:
         return j
 
     def handle_cycle_predicate(self, predicate):
+        """
+        @TODO написать комментарии к коду, реализовать метод
+        :param predicate:
+        :return:
+        """
         ...
 
     def handle_cycle_body(self, body):
+        """
+        @TODO написать комментарии к коду, реализовать метод
+        :param body:
+        :return:
+        """
         ...
 
     def handle_another(self, i):
+        """
+        @TODO написать комментарии к коду
+        :param i:
+        :return:
+        """
         j = i
         while self.cpp_code[j] != ";":
             j += 1
         j += 1  # останавливается перед ;
         substring = self.cpp_code[i:j]
-        print(substring)
+        # print(substring)
         if not re.match("[a-zA-Z0-9]+=[0-9]+;", substring):
             raise Exception("Писать без ошибок - удел слабых. Кто-то будет писать так, как он захочет, только прогу я не скомпилю :)")
         lst = substring.split("=")
