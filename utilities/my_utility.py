@@ -1,6 +1,5 @@
 def search_closing_bracket(text: str, i: int):
     cnt = 0
-    idx = 0
     for idx in range(i, len(text)):
         if text[idx] == "{":
             cnt += 1

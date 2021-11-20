@@ -35,12 +35,14 @@ for    (int dss = 1; dss   <   5; dss++){
         for (int l = 0; l > 123; l++)
         {
             l++;
+            asd++;
         }
     }
+
     int testThisShit = 11123;
 }
 int wtf;
 for (int for2 = 0; for2 < 1; for2++)
 {
-    testThisShit++;
+    for2++;
 }

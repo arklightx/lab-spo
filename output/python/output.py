@@ -29,7 +29,8 @@ for dss in range(dss, 5, 1):
 		l = 0
 		for l in range(l, 123, 1):
 			l += 1
+			asd += 1
 	testThisShit = 11123
 for2 = 0
 for for2 in range(for2, 1, 1):
-	testThisShit += 1
+	for2 += 1

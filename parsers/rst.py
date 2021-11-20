@@ -16,6 +16,7 @@ class NarberalGamma:
     root_tree.data = {}
     root_tree_path = root_tree.path
     current_tree = root_tree
+    current_tree.data = {}
     prev_tree = root_tree
 
     table: list = [
@@ -63,23 +64,15 @@ class NarberalGamma:
         """
         i = 0
         while i < len(code):
-            if self.depth_for == 0:
-                self.prev_depth = 0
-                self.current_tree = self.root_tree
-            # else:
-            #     diff = self.depth_for - self.prev_depth
-            #     for a in range(diff):
-            #         self.current_tree = self.current_tree.parent
             if code[i:i + 3] == "int":
                 i = self.handle_int(i, code) - 1
-            elif code[i:i + 3] == "for":
+            elif code[i:i + 3] == "for" and code[i + 3] == " ":
                 i = self.handle_for(i, code) - 1
             elif code[i].isdigit():
                 raise Exception(f"Ошибка в написании программы. Индекс ошибки: {i}")
             else:
                 i = self.handle_another(i, code) - 1
             i += 1
-        # self.check_tree()
 
     def handle_int(self, i, code):
         """
@@ -131,10 +124,17 @@ class NarberalGamma:
         :param i:
         :return:
         """
-        self.number_for += 1
-        self.depth_for += 1
-        self.check_tree()
         self.prev_depth = self.depth_for
+        self.number_for += 1
+
+        if self.number_for == 8:
+            print("KEK")
+
+        self.depth_for += 1
+
+        self.current_tree = Node(f"{self.number_for}", parent=self.current_tree)
+        self.current_tree.data = {}
+
         j = util.search_closing_bracket(code, i) + 1
         substring = code[i + 4:j]  # +4, потому что int 3 буквы и пробел 1
         self.parsed_table.append("1.2")
@@ -148,11 +148,8 @@ class NarberalGamma:
         self.graph.append(GraphView(type="for_start", keywords={}))
         self.handle_cycle_body(body)
         self.depth_for -= 1
-        # self.prev_depth += 1
-        # self.prev_depth = self.depth_for + 1
-        # self.current_tree = self.current_tree.parent
+        self.current_tree = self.current_tree.parent
         self.graph.append(GraphView(type="for_end", keywords={}))
-        # self.prev_depth = self.depth_for
         return j
 
     def handle_cycle_predicate(self, predicate) -> dict:
@@ -165,14 +162,11 @@ class NarberalGamma:
         step = 1
         var, pred, counter = predicate.split(";")
         if re.match("int [a-zA-Z0-9]+=[a-zA-Z0-9]+", var):
-            self.handle_int(0, var+";")
+            self.handle_int(0, var + ";")
         elif re.match("[a-zA-Z0-9]+=[a-zA-Z0-9]+", var):
-            self.handle_another(0, var+";")
+            self.handle_another(0, var + ";")
         else:
             ...
-        # self.check_tree()
-        # if var not in self.table[4]:
-        #     raise Exception("Переменная не объявлена, но юзается в for")
         if "<" in pred:
             # for var in range(container[0], container[1], step)
             container = pred.split("<")
@@ -199,13 +193,7 @@ class NarberalGamma:
         :param body:
         :return:
         """
-        try:
-            self.parse(body)
-            # self.current_tree = self.current_tree.parent
-        except:
-            print(self.current_tree)
-            print(self.depth_for)
-            print(self.prev_depth)
+        self.parse(body)
 
     def handle_another(self, i, code):
         """
@@ -216,7 +204,6 @@ class NarberalGamma:
         """
         j = util.get_position_before_item(code, ";", i) + 1
         substring = code[i:j]
-        # print(substring)
         if re.match("[a-zA-Z0-9]+=[0-9]+;", substring):
             lst = substring.split("=")
             variable = lst[0]
@@ -224,8 +211,7 @@ class NarberalGamma:
                 raise Exception(f"Нарушена область видимости. "
                                 f"Переменная {variable} объявлена на уровне {self.table[5][variable]['depth']}, "
                                 f"однако идёт попытка переопределить на уровне {self.depth_for}")
-            elif self.table[5][variable]["context"] != self.number_for:
-                ...
+            self.check_context(variable)
             value = lst[1][:-1]
             if variable in self.table[4]:
                 self.table[3].append((variable, value))
@@ -239,6 +225,9 @@ class NarberalGamma:
                 raise Exception(f"Нарушена область видимости. "
                                 f"Переменная {variable} объявлена на уровне {self.table[5][variable]['depth']}, "
                                 f"однако идёт попытка переопределить на уровне {self.depth_for}")
+
+            self.check_context(variable)
+
             if variable in self.table[4]:
                 self.graph.append(GraphView(type="increment", keywords={"variable": variable}))
             else:
@@ -251,29 +240,18 @@ class NarberalGamma:
     def get_graph(self):
         return self.graph
 
-    def check_tree(self):
-        if self.prev_depth < self.depth_for:
-            node = Node(self.number_for, parent=self.current_tree)
-            self.current_tree = node
-        elif self.prev_depth == self.depth_for:
-            node = Node(self.number_for, parent=self.current_tree.parent)
-            self.current_tree = node
-        elif self.prev_depth > self.depth_for:
-            diff = self.prev_depth - self.depth_for
-            # parent_node = self.current_tree.parent
-            for i in range(diff+1):
-                self.current_tree = self.current_tree.parent
-            node = Node(self.number_for, parent=self.current_tree)
-            self.current_tree = node
-            # print(f"[\n\tdiff: {diff}\n\tprev: {self.prev_depth}\n\t"
-            #       f"depth: {self.depth_for}\n\tnode: {self.current_tree}\n\t"
-            #       f"root_tree: {self.root_tree.descendants}\n]")
-        else:
-            self.current_tree = self.root_tree
-        # try:
-        #     self.current_tree.__getattribute__("data")
-        # except:
-        self.current_tree.data = {}
-
     def get_depths(self):
         return f"depth_for: {self.depth_for}\tprev_depth: {self.prev_depth}"
+
+    def check_context(self, variable):
+        local_tree = self.current_tree
+        # first_iter_data = local_tree.data
+        # if variable in first_iter_data:
+        #     return True
+        while local_tree is not None:
+            data = local_tree.data
+            if variable in data:
+                # print(f"Var: {variable}, true")
+                return True
+            local_tree = local_tree.parent
+        raise Exception(f"Переменная {variable} находится вне области видимости")

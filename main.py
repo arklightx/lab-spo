@@ -11,7 +11,6 @@ if __name__ == '__main__':
     nabe = NarberalGamma("main.cpp")
     nabe.parse(nabe.cpp_code)
     graph = nabe.get_graph()
-    print(nabe.get_depths())
     # pprint(graph)
     eot = EchoOfTerror(graph, "output.py")
     eot.build()
