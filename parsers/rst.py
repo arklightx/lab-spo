@@ -1,6 +1,7 @@
 import re
 from pathlib import Path
 from utilities import parser_utility as util
+from utilities.graph_view import GraphView
 
 
 class NarberalGamma:
@@ -16,13 +17,7 @@ class NarberalGamma:
         set(),  # set объявленных значений
     ]
 
-    # table: dict = {
-    #     "keywords": ["int", "for", "cout", "cin"],
-    #     "operators": ["<", ">", "<<", ">>", "++", "--"],
-    #     "delimiters": ["{", "}", "(", ")", ";"],
-    #     "values": [],
-    #     "declared": set()
-    # }
+    graph: list = []
 
     parsed_table: list = []
 
@@ -69,6 +64,7 @@ class NarberalGamma:
                 i = self.handle_another(i) - 1
             i += 1
         print(self.parsed_table)
+        print(self.graph)
 
     def handle_int(self, i):
         """
@@ -100,11 +96,13 @@ class NarberalGamma:
             if value:
                 # print(value.group(1))
                 self.table[3].append((variable, value.group(1)))
+                self.graph.append(GraphView(type="int", keywords={"variable": variable, "value": value.group(1)}))
                 self.parsed_table.append(f"4.{len(self.table[3])}")
             else:
                 raise Exception("Не объявлена переменная")
         else:
             self.table[3].append((variable, ""))
+            self.graph.append(GraphView(type="empty_int", keywords={"variable": variable, "value": ""}))
             self.parsed_table.append(f"4.{len(self.table[3])}")
         return j
 
@@ -167,6 +165,7 @@ class NarberalGamma:
         value = lst[1]
         if variable in self.table[4]:
             self.table[3].append((variable, value))
+            self.graph.append(GraphView(type="reassignment", keywords={"variable": variable, "value": value}))
             self.parsed_table.append(f"4.{len(self.table[3])}")
         else:
             raise Exception("Использование переменной до инициализации")
