@@ -207,10 +207,7 @@ class NarberalGamma:
         if re.match("[a-zA-Z0-9]+=[0-9]+;", substring):
             lst = substring.split("=")
             variable = lst[0]
-            if self.table[5][variable]["depth"] > self.depth_for:
-                raise Exception(f"Нарушена область видимости. "
-                                f"Переменная {variable} объявлена на уровне {self.table[5][variable]['depth']}, "
-                                f"однако идёт попытка переопределить на уровне {self.depth_for}")
+            self.check_context(variable)
             self.check_context(variable)
             value = lst[1][:-1]
             if variable in self.table[4]:
@@ -221,10 +218,6 @@ class NarberalGamma:
                 raise Exception("Использование переменной до инициализации")
         elif re.match("[a-zA-Z0-9]+\+\+;", substring):
             variable = substring.split("++")[0]
-            if self.table[5][variable]["depth"] > self.depth_for:
-                raise Exception(f"Нарушена область видимости. "
-                                f"Переменная {variable} объявлена на уровне {self.table[5][variable]['depth']}, "
-                                f"однако идёт попытка переопределить на уровне {self.depth_for}")
 
             self.check_context(variable)
 
@@ -245,13 +238,9 @@ class NarberalGamma:
 
     def check_context(self, variable):
         local_tree = self.current_tree
-        # first_iter_data = local_tree.data
-        # if variable in first_iter_data:
-        #     return True
         while local_tree is not None:
             data = local_tree.data
             if variable in data:
-                # print(f"Var: {variable}, true")
                 return True
             local_tree = local_tree.parent
-        raise Exception(f"Переменная {variable} находится вне области видимости")
+        raise Exception(f"Переменная {variable} находится вне области видимости или была использована до инициализации")
