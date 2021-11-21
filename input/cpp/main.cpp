@@ -1,17 +1,18 @@
 int   a1       =123;
-int c;
+int c = 14;
 int
    b
       =
-         1;
+         c;
 c =444124;
-for    (int dss = 1; dss   <   5; dss++){
+for    (int dss = 1; c   <   4; dss++){
     int d = 4;
     int y =   5;
+    int testEmpty;
     for (a1 = 15; a1>15; a1++) {
         int jke = 123;
-        for (d; d > 123; d++) {
-            int zxc = 123;
+        for (d; d > c; d++) {
+            int zxc = c;
             zxc++;
             d++;
             for (int alt = 1; alt < 1; alt++)
@@ -32,7 +33,7 @@ for    (int dss = 1; dss   <   5; dss++){
         asd++;
         asd++;
         asd++;
-        for (int l = 0; l > 123; l++)
+        for (int l = 0; l > 1234; l++)
         {
             l++;
             asd++;

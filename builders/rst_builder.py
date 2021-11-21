@@ -20,12 +20,10 @@ class EchoOfTerror:
                 string = "".ljust(tab_size, "\t")
                 if item.type == "int":
                     string = string + f"{item.keywords['variable']} = {item.keywords['value']}"
-                # elif item.type == "empty_int":
-                #     ...
                 elif item.type == "reassignment":
                     string = string + f"{item.keywords['variable']} = {item.keywords['value']}"
                 elif item.type == "for":
-                    string = string + f"for {item.keywords['predicate']['start']} in " \
+                    string = string + f"for {item.keywords['predicate']['var']} in " \
                                       f"range({item.keywords['predicate']['start']}, " \
                                       f"{item.keywords['predicate']['end']}, " \
                                       f"{item.keywords['predicate']['step']}):"

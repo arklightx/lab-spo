@@ -1,15 +1,16 @@
 a1 = 123
-b = 1
+c = 14
+b = c
 c = 444124
 dss = 1
-for dss in range(dss, 5, 1):
+for dss in range(c, 4, 1):
 	d = 4
 	y = 5
 	a1 = 15
 	for a1 in range(a1, 15, 1):
 		jke = 123
-		for d in range(d, 123, 1):
-			zxc = 123
+		for d in range(d, c, 1):
+			zxc = c
 			zxc += 1
 			d += 1
 			alt = 1
@@ -27,7 +28,7 @@ for dss in range(dss, 5, 1):
 		asd += 1
 		asd += 1
 		l = 0
-		for l in range(l, 123, 1):
+		for l in range(l, 1234, 1):
 			l += 1
 			asd += 1
 	testThisShit = 11123

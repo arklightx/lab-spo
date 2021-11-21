@@ -1,3 +1,5 @@
+import re
+
 def search_closing_bracket(text: str, i: int):
     cnt = 0
     for idx in range(i, len(text)):
@@ -29,3 +31,21 @@ def get_lang_by_file(file):
         return "python"
     else:
         raise Exception("Неподдерживаемое расширение файла")
+
+
+def is_var_digit(string: str):
+    if re.match(r"[a-zA-Z][a-zA-Z0-9]*=[0-9]+", string):
+        return True
+    return False
+
+
+def is_var_var(string: str):
+    if re.match(r"[a-zA-Z][a-zA-Z0-9]*=[a-zA-Z][a-zA-Z0-9]*", string):
+        return True
+    return False
+
+
+def is_var(string: str):
+    if re.match(r"[a-zA-Z][a-zA-Z0-9]*", string):
+        return True
+    return False

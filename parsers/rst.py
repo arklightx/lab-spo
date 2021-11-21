@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 from utilities import my_utility as util
 from utilities.graph_view import GraphView
-from utilities.my_utility import get_lang_by_file
+from utilities.my_utility import *
 from anytree import Node, findall, find, find_by_attr, findall_by_attr
 
 
@@ -52,9 +52,9 @@ class NarberalGamma:
             lines = re.sub(">> ", ">>", lines)
             lines = re.sub("[ ]*<[ ]*", "<", lines)
             lines = re.sub("[ ]*>[ ]*", ">", lines)
-            lines = re.sub("\{[ ]*", "{", lines)
-            lines = re.sub("\}[ ]*", "}", lines)
-            lines = re.sub("\)\{", ") {", lines)
+            lines = re.sub(r"\{[ ]*", "{", lines)
+            lines = re.sub(r"\}[ ]*", "}", lines)
+            lines = re.sub(r"\)\{", ") {", lines)
             self.cpp_code = lines
 
     def parse(self, code):
@@ -86,35 +86,73 @@ class NarberalGamma:
         while code[j] != ";":
             j += 1
         j += 1  # останавливается перед ;
-        if not re.match("int [a-zA-Z0-9]+;|int [a-zA-Z0-9]+=[0-9]+;", code[i:j]):
+        if not re.match("int [a-zA-Z0-9]+;|int [a-zA-Z0-9]+=[0-9]+;|int [a-zA-Z0-9]+=[a-zA-Z0-9]+;", code[i:j]):
             raise Exception("Непонятный int")
         self.parsed_table.append(f"1.1")
         substring = code[i + 4:j]  # int+пробел
+
+        # @TODO отследить повторное объявление
+        top_level_var = None
+        if is_var_digit(substring[:-1]):
+            top_level_var, var2 = substring.split("=")
+            var2 = var2[:-1]
+            self.table[3].append((top_level_var, var2))
+            self.graph.append(GraphView(type="int", keywords={"variable": top_level_var, "value": var2}))
+        elif is_var_var(substring[:-1]):
+            top_level_var, var2 = substring.split("=")
+            var2 = var2[:-1]
+            self.check_context(var2)
+            if not self.search_reassign_variable_in_graph(var2):
+                raise Exception("Переприсваивание на empty переменную")
+            self.table[3].append((top_level_var, var2))
+            self.graph.append(GraphView(type="int", keywords={"variable": top_level_var, "value": var2}))
+        elif is_var(substring[:-1]):
+            top_level_var = substring[:-1]
+            self.graph.append(GraphView(type="empty_int", keywords={"variable": top_level_var, "value": ""}))
+            self.table[3].append((top_level_var, ""))
+        else:
+            raise Exception("Неверная инициализация переменной")
+
+        self.parsed_table.append(f"4.{len(self.table[3])}")
+        if top_level_var not in self.table[4]:
+            self.table[4].add(top_level_var)
+        else:
+            raise Exception("Повторное объявление переменной")
+        self.table[5][top_level_var] = {"depth": self.depth_for, "context": self.number_for}
+        self.current_tree.data[top_level_var] = self.depth_for
+
+        # ----------------------------------------
+
         # Поиск переменной из подстроки (a1=1234 попытается найти a1)
-        if "=" in substring:
-            variable = substring[:util.get_position_before_item(substring, "=")]
-        else:
-            variable = substring[:util.get_position_before_item(substring, ";")]
-        if variable in self.table[4]:  # Тут надо чёта тоже будет делать с видимостью
-            raise Exception("Повторно объявленная переменная")
-        else:
-            self.table[4].add(variable)
-            self.table[5][variable] = {"depth": self.depth_for, "context": self.number_for}
-            self.current_tree.data[variable] = self.depth_for
-        # Поиск значения из подстроки (a1=1234 попытается найти 1234)
-        if "=" in substring:
-            value = re.search("=([0-9]+)", substring)
-            if value:
-                # print(value.group(1))
-                self.table[3].append((variable, value.group(1)))
-                self.graph.append(GraphView(type="int", keywords={"variable": variable, "value": value.group(1)}))
-                self.parsed_table.append(f"4.{len(self.table[3])}")
-            else:
-                raise Exception("Не объявлена переменная")
-        else:
-            self.table[3].append((variable, ""))
-            self.graph.append(GraphView(type="empty_int", keywords={"variable": variable, "value": ""}))
-            self.parsed_table.append(f"4.{len(self.table[3])}")
+        # if "=" in substring:
+        #     variable = substring[:util.get_position_before_item(substring, "=")]
+        #     var1, var2 = substring.split("=")
+        #     var2 = var2[:-1]  # убирает ;
+        #     if not var2.isdigit():
+        #         self.check_context(var2)
+        # else:
+        #     variable = substring[:util.get_position_before_item(substring, ";")]
+        # if variable in self.table[4]:  # Тут надо чёта тоже будет делать с видимостью
+        #     raise Exception("Повторно объявленная переменная")
+        # else:
+        #     self.table[4].add(variable)
+        #     self.table[5][variable] = {"depth": self.depth_for, "context": self.number_for}
+        #     self.current_tree.data[variable] = self.depth_for
+        # # Поиск значения из подстроки (a1=1234 попытается найти 1234)
+        # # @TODO исправить предикат, чёта придумать с ифом
+        # if "=" in substring:
+        #     value = re.search(r"=([0-9]+)", substring)
+        #     if value:
+        #         # print(value.group(1))
+        #         self.table[3].append((variable, value.group(1)))
+        #         self.graph.append(GraphView(type="int", keywords={"variable": variable, "value": value.group(1)}))
+        #         self.parsed_table.append(f"4.{len(self.table[3])}")
+        #     else:
+        #         raise Exception("Не объявлена переменная")
+        # else:
+        #     self.table[3].append((variable, ""))
+        #     self.graph.append(GraphView(type="empty_int", keywords={"variable": variable, "value": ""}))
+        #     self.parsed_table.append(f"4.{len(self.table[3])}")
         return j
 
     def handle_for(self, i, code):
@@ -166,7 +204,7 @@ class NarberalGamma:
         elif re.match("[a-zA-Z0-9]+=[a-zA-Z0-9]+", var):
             self.handle_another(0, var + ";")
         else:
-            ...
+            self.check_context(var)
         if "<" in pred:
             # for var in range(container[0], container[1], step)
             container = pred.split("<")
@@ -176,9 +214,19 @@ class NarberalGamma:
         else:
             raise Exception("Без предиката не сработает в удаве")
         var_counter = counter.split("++")
-        if var_counter[0] != container[0]:
-            raise Exception("Инкрементируется другое значение. Бесконечный цикл.")
-        return {"start": container[0], "end": container[1], "step": step}
+
+        if not str(container[0]).isdigit():
+            self.check_context(container[0])
+        if not str(container[1]).isdigit():
+            self.check_context(container[1])
+
+        if container[0].isdigit() and container[1].isdigit():
+            if int(container[0]) != int(container[1]):
+                raise Exception("Нереализумый предикат: left int, right int, not equal")
+
+        # if var_counter[0] != container[0]:
+        #     raise Exception("Инкрементируется другое значение. Бесконечный цикл.")
+        return {"var": var_counter[0], "start": container[0], "end": container[1], "step": step}
 
     def is_increment(self, code):
         if "++" in code:
@@ -207,7 +255,6 @@ class NarberalGamma:
         if re.match("[a-zA-Z0-9]+=[0-9]+;", substring):
             lst = substring.split("=")
             variable = lst[0]
-            self.check_context(variable)
             self.check_context(variable)
             value = lst[1][:-1]
             if variable in self.table[4]:
@@ -244,3 +291,11 @@ class NarberalGamma:
                 return True
             local_tree = local_tree.parent
         raise Exception(f"Переменная {variable} находится вне области видимости или была использована до инициализации")
+
+    def search_reassign_variable_in_graph(self, variable):
+        for item in self.graph:
+            if item.type == "int" or item.type == "reassignment":
+                if item.keywords["variable"] == variable:
+                    if item.keywords["value"] != '':
+                        return True
+        return False
