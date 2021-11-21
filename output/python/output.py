@@ -1,7 +1,7 @@
 a1 = 123
 c = 14
 b = c
-c = 444124
+c = b
 dss = 1
 for dss in range(c, 4, 1):
 	d = 4

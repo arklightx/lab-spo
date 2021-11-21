@@ -4,7 +4,7 @@ int
    b
       =
          c;
-c =444124;
+c =b;
 for    (int dss = 1; c   <   4; dss++){
     int d = 4;
     int y =   5;

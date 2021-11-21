@@ -225,7 +225,8 @@ class NarberalGamma:
         """
         j = util.get_position_before_item(code, ";", i) + 1
         substring = code[i:j]
-        if re.match("[a-zA-Z0-9]+=[0-9]+;", substring):
+        print(substring)
+        if is_var_digit(substring[:-1]):
             lst = substring.split("=")
             variable = lst[0]
             self.check_context(variable)
@@ -245,6 +246,11 @@ class NarberalGamma:
                 self.graph.append(GraphView(type="increment", keywords={"variable": variable}))
             else:
                 raise Exception("Использование переменной до инициализации")
+        elif is_var_var(substring[:-1]):
+            var1, var2 = substring[:-1].split("=")
+            self.check_context(var1)
+            self.check_context(var2)
+            self.graph.append(GraphView(type="reassignment", keywords={"variable": var1, "value": var2}))
         else:
             raise Exception("Писать без ошибок - удел слабых. "
                             "Кто-то будет писать так, как он захочет, только прогу я не скомпилю :)")
