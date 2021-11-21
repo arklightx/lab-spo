@@ -117,42 +117,15 @@ class NarberalGamma:
         if top_level_var not in self.table[4]:
             self.table[4].add(top_level_var)
         else:
-            raise Exception("Повторное объявление переменной")
+            predicate = False
+            try:
+                predicate = self.check_context(top_level_var)
+            except:
+                pass
+            if predicate:
+                raise Exception("Повторное объявление переменной")
         self.table[5][top_level_var] = {"depth": self.depth_for, "context": self.number_for}
         self.current_tree.data[top_level_var] = self.depth_for
-
-        # ----------------------------------------
-
-        # Поиск переменной из подстроки (a1=1234 попытается найти a1)
-        # if "=" in substring:
-        #     variable = substring[:util.get_position_before_item(substring, "=")]
-        #     var1, var2 = substring.split("=")
-        #     var2 = var2[:-1]  # убирает ;
-        #     if not var2.isdigit():
-        #         self.check_context(var2)
-        # else:
-        #     variable = substring[:util.get_position_before_item(substring, ";")]
-        # if variable in self.table[4]:  # Тут надо чёта тоже будет делать с видимостью
-        #     raise Exception("Повторно объявленная переменная")
-        # else:
-        #     self.table[4].add(variable)
-        #     self.table[5][variable] = {"depth": self.depth_for, "context": self.number_for}
-        #     self.current_tree.data[variable] = self.depth_for
-        # # Поиск значения из подстроки (a1=1234 попытается найти 1234)
-        # # @TODO исправить предикат, чёта придумать с ифом
-        # if "=" in substring:
-        #     value = re.search(r"=([0-9]+)", substring)
-        #     if value:
-        #         # print(value.group(1))
-        #         self.table[3].append((variable, value.group(1)))
-        #         self.graph.append(GraphView(type="int", keywords={"variable": variable, "value": value.group(1)}))
-        #         self.parsed_table.append(f"4.{len(self.table[3])}")
-        #     else:
-        #         raise Exception("Не объявлена переменная")
-        # else:
-        #     self.table[3].append((variable, ""))
-        #     self.graph.append(GraphView(type="empty_int", keywords={"variable": variable, "value": ""}))
-        #     self.parsed_table.append(f"4.{len(self.table[3])}")
         return j
 
     def handle_for(self, i, code):

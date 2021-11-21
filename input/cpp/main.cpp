@@ -47,3 +47,4 @@ for (int for2 = 0; for2 < 1; for2++)
 {
     for2++;
 }
+int d = 10;

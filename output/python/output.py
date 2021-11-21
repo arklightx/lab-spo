@@ -35,3 +35,4 @@ for dss in range(c, 4, 1):
 for2 = 0
 for for2 in range(for2, 1, 1):
 	for2 += 1
+d = 10
