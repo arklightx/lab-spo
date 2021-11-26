@@ -1,9 +1,11 @@
+import pprint
 import re
 from pathlib import Path
 from utilities import my_utility as util
 from utilities.graph_view import GraphView
 from utilities.my_utility import *
 from anytree import Node, findall, find, find_by_attr, findall_by_attr
+import json
 
 
 class NarberalGamma:
@@ -14,10 +16,8 @@ class NarberalGamma:
 
     root_tree = Node(f"{number_for}")
     root_tree.data = {}
-    root_tree_path = root_tree.path
     current_tree = root_tree
     current_tree.data = {}
-    prev_tree = root_tree
 
     table: list = [
         ["int", "for", "cout", "cin"],
@@ -59,7 +59,6 @@ class NarberalGamma:
 
     def parse(self, code):
         """
-        @TODO перестроить под возможную рекурсию (добавить в параметры текст, который можно было бы прогонять в цикле)
         :return:
         """
         i = 0
@@ -130,7 +129,6 @@ class NarberalGamma:
 
     def handle_for(self, i, code):
         """
-        @TODO сделать эту поебень
         :param code:
         :param i:
         :return:
@@ -278,3 +276,20 @@ class NarberalGamma:
                     if item.keywords["value"] != '':
                         return True
         return False
+
+    def lab1_de_facto(self):
+        out_file = Path(__file__).cwd() / "output" / "parsed" / "parsed.json"
+        data = []
+        with open(out_file, "w+") as file:
+            for item in self.graph:
+                data.append({"type": item.type, "keywords": item.keywords})
+            json.dump(data, file)
+
+    def lab2_de_facto(self):
+        input_file = Path(__file__).cwd() / "output" / "parsed" / "parsed.json"
+        self.graph = []
+        with open(input_file, "r") as file:
+            data = json.load(file)
+            for item in data:
+                self.graph.append(GraphView(item["type"], item["keywords"]))
+            pprint.pprint(self.graph)

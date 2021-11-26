@@ -9,8 +9,9 @@ from anytree import RenderTree, AsciiStyle, ContStyle
 if __name__ == '__main__':
     nabe = NarberalGamma("main.cpp")
     nabe.parse(nabe.cpp_code)
+    nabe.lab1_de_facto()
+    nabe.lab2_de_facto()
     graph = nabe.get_graph()
-    pprint(graph)
     eot = EchoOfTerror(graph, "output.py")
     eot.build()
     print(RenderTree(nabe.root_tree, style=AsciiStyle()))

@@ -18,11 +18,11 @@ for    (int dss = 1; c   <   4; dss++){
             for (int alt = 1; alt < 1; alt++)
             {
                 alt++;
-                for (int fuckup = 123; fuckup < 1111; fuckup++)
+                for (int wasd = 123; wasd < 1111; wasd++)
                 {
-                    fuckup++;
+                    wasd++;
                 }
-                int fuckup2 = 111;
+                int wasd2 = 111;
             }
         }
     }
@@ -40,9 +40,9 @@ for    (int dss = 1; c   <   4; dss++){
         }
     }
 
-    int testThisShit = 11123;
+    int testChecker = 11123;
 }
-int wtf;
+int ewq;
 for (int for2 = 0; for2 < 1; for2++)
 {
     for2++;

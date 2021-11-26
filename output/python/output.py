@@ -16,10 +16,10 @@ for dss in range(c, 4, 1):
 			alt = 1
 			for alt in range(alt, 1, 1):
 				alt += 1
-				fuckup = 123
-				for fuckup in range(fuckup, 1111, 1):
-					fuckup += 1
-				fuckup2 = 111
+				wasd = 123
+				for wasd in range(wasd, 1111, 1):
+					wasd += 1
+				wasd2 = 111
 	y += 1
 	iAmResistanceJkee = 15
 	for iAmResistanceJkee in range(iAmResistanceJkee, 555, 1):
@@ -31,7 +31,7 @@ for dss in range(c, 4, 1):
 		for l in range(l, 1234, 1):
 			l += 1
 			asd += 1
-	testThisShit = 11123
+	testChecker = 11123
 for2 = 0
 for for2 in range(for2, 1, 1):
 	for2 += 1
